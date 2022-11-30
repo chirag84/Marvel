@@ -10,7 +10,7 @@ import Foundation
 struct Constants {
     
     struct API {
-        static let baseUrl = "https://gateway.marvel.com:443/v1/public/"
+        static let baseUrl = "https://gateway.marvel.com/v1/public/"
         static let characters = "\(Constants.API.baseUrl)/characters"
         static let privateKey = "cd3365f42c69f1435caa8383b2b9e82ecccfca78"
         static let publicKey = "f7dd6da14fb22dc378cabc827864c51a"
@@ -33,6 +33,11 @@ struct Constants {
         static let hash = "hash"
         static let publicKey = "apikey"
         static let nameStartsWith = "nameStartsWith"
+    }
+
+    struct Label {
+        static let marvelCharacters = "Marvel Characters"
+        static let searchByCharacter = "Search by character"
     }
     
 }
