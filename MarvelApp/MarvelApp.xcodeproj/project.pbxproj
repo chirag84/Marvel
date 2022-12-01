@@ -23,6 +23,10 @@
 		1422468F2937C3550095D4C9 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142246892937C3550095D4C9 /* Constants.swift */; };
 		142246902937C3550095D4C9 /* NetworkServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1422468B2937C3550095D4C9 /* NetworkServiceProtocol.swift */; };
 		142246912937C3550095D4C9 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1422468C2937C3550095D4C9 /* NetworkService.swift */; };
+		1493BD0F29384A4F00994242 /* CharacterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1493BD0E29384A4F00994242 /* CharacterViewModel.swift */; };
+		1493BD1129384C2300994242 /* CharacterViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1493BD1029384C2300994242 /* CharacterViewModelProtocol.swift */; };
+		1493BD1429384C9B00994242 /* CharactersCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1493BD1329384C9B00994242 /* CharactersCell.swift */; };
+		1493BD1629384CB600994242 /* CharactersCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1493BD1529384CB600994242 /* CharactersCellModel.swift */; };
 		1C83E5C185B9A58B9DC87EEE /* Pods_MarvelApp_MarvelAppUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DBF9C254430100DB3BED07D /* Pods_MarvelApp_MarvelAppUITests.framework */; };
 		63ACAE426713202CACB227D8 /* Pods_MarvelAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 160ED7B6E2E5AD4E6557B41C /* Pods_MarvelAppTests.framework */; };
 /* End PBXBuildFile section */
@@ -64,6 +68,10 @@
 		142246892937C3550095D4C9 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		1422468B2937C3550095D4C9 /* NetworkServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkServiceProtocol.swift; sourceTree = "<group>"; };
 		1422468C2937C3550095D4C9 /* NetworkService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		1493BD0E29384A4F00994242 /* CharacterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterViewModel.swift; sourceTree = "<group>"; };
+		1493BD1029384C2300994242 /* CharacterViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterViewModelProtocol.swift; sourceTree = "<group>"; };
+		1493BD1329384C9B00994242 /* CharactersCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersCell.swift; sourceTree = "<group>"; };
+		1493BD1529384CB600994242 /* CharactersCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersCellModel.swift; sourceTree = "<group>"; };
 		160ED7B6E2E5AD4E6557B41C /* Pods_MarvelAppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MarvelAppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		181EA697EC53A250E40A392F /* Pods-MarvelApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MarvelApp.release.xcconfig"; path = "Target Support Files/Pods-MarvelApp/Pods-MarvelApp.release.xcconfig"; sourceTree = "<group>"; };
 		1D560DB4F9C0F2F13FFD8CC8 /* Pods-MarvelApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MarvelApp.debug.xcconfig"; path = "Target Support Files/Pods-MarvelApp/Pods-MarvelApp.debug.xcconfig"; sourceTree = "<group>"; };
@@ -130,9 +138,10 @@
 			children = (
 				142246332937B2DC0095D4C9 /* AppDelegate.swift */,
 				142246352937B2DC0095D4C9 /* SceneDelegate.swift */,
+				142246842937C3550095D4C9 /* Model */,
+				1493BD0D293849ED00994242 /* ViewModel */,
 				142246922937C5B10095D4C9 /* View */,
 				142246862937C3550095D4C9 /* Extension */,
-				142246842937C3550095D4C9 /* Model */,
 				1422468A2937C3550095D4C9 /* NetworkService */,
 				142246882937C3550095D4C9 /* Utility */,
 				142246392937B2DC0095D4C9 /* Main.storyboard */,
@@ -198,8 +207,27 @@
 			isa = PBXGroup;
 			children = (
 				142246372937B2DC0095D4C9 /* CharacterViewController.swift */,
+				1493BD1229384C8800994242 /* Cells */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		1493BD0D293849ED00994242 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				1493BD0E29384A4F00994242 /* CharacterViewModel.swift */,
+				1493BD1029384C2300994242 /* CharacterViewModelProtocol.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		1493BD1229384C8800994242 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				1493BD1329384C9B00994242 /* CharactersCell.swift */,
+				1493BD1529384CB600994242 /* CharactersCellModel.swift */,
+			);
+			path = Cells;
 			sourceTree = "<group>";
 		};
 		25CF86A809706334EF88044F /* Pods */ = {
@@ -466,10 +494,14 @@
 			files = (
 				142246382937B2DC0095D4C9 /* CharacterViewController.swift in Sources */,
 				1422468D2937C3550095D4C9 /* MarvelCharacter.swift in Sources */,
+				1493BD1129384C2300994242 /* CharacterViewModelProtocol.swift in Sources */,
 				142246342937B2DC0095D4C9 /* AppDelegate.swift in Sources */,
 				1422468E2937C3550095D4C9 /* String+MD5.swift in Sources */,
 				142246912937C3550095D4C9 /* NetworkService.swift in Sources */,
 				142246902937C3550095D4C9 /* NetworkServiceProtocol.swift in Sources */,
+				1493BD1629384CB600994242 /* CharactersCellModel.swift in Sources */,
+				1493BD1429384C9B00994242 /* CharactersCell.swift in Sources */,
+				1493BD0F29384A4F00994242 /* CharacterViewModel.swift in Sources */,
 				1422468F2937C3550095D4C9 /* Constants.swift in Sources */,
 				1422463E2937B2DC0095D4C9 /* MarvelApp.xcdatamodeld in Sources */,
 				142246362937B2DC0095D4C9 /* SceneDelegate.swift in Sources */,
@@ -658,6 +690,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -687,6 +720,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

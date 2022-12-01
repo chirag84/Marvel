@@ -40,5 +40,9 @@ struct Constants {
         static let searchByCharacter = "Search by character"
     }
     
+    struct Cell {
+        static let charactersCell = "CharactersCell"
+    }
+    
 }
 

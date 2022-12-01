@@ -9,16 +9,16 @@ import UIKit
 
 class CharacterViewController: UIViewController {
 
+    var viewModel: CharacterViewModel!
+    
     private let sectionInsets = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: 10.0)
     private let itemsPerRow: CGFloat = 2
-    private var cellId = "CharactersCell"
-  
-  
     
     lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.tintColor = .black
         refreshControl.addTarget(self, action: #selector(refreshCharacters), for: .valueChanged)
+        
         return refreshControl
     }()
     
@@ -34,14 +34,14 @@ class CharacterViewController: UIViewController {
     
     lazy var collectionView: UICollectionView! = {
         var view = UICollectionView(frame: self.view.frame, collectionViewLayout: flowLayout)
-        
+        view.register(CharactersCell.self, forCellWithReuseIdentifier: Constants.Cell.charactersCell)
         view.translatesAutoresizingMaskIntoConstraints = false
         view.setCollectionViewLayout(flowLayout, animated: true)
-        view.backgroundColor = UIColor.clear
-        view.addSubview(refreshControl)
-        view.alwaysBounceVertical = false
-        view.showsVerticalScrollIndicator = true
         view.refreshControl?.addTarget(self, action: #selector(refreshCharacters), for: .valueChanged)
+        view.showsVerticalScrollIndicator = true
+        view.backgroundColor = UIColor.clear
+        view.alwaysBounceVertical = false
+        view.addSubview(refreshControl)
         view.isScrollEnabled = true
         view.dataSource = self
         view.delegate = self
@@ -52,6 +52,13 @@ class CharacterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        self.title = Constants.Label.marvelCharacters
+        self.viewModel = CharacterViewModel(service: NetworkService())
+        setupView()
+        
+        // Fetch characters
+        self.getCharacters(offset: 0)
     }
 
     private func setupView() {
@@ -60,16 +67,29 @@ class CharacterViewController: UIViewController {
         
         collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         collectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        collectionView.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -16).isActive = true
+        collectionView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
     
     @objc func refreshCharacters() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            
+            self.getCharacters(offset: 0)
         }
         
     }
+    
+    func getCharacters(offset: Int, name: String? = nil) {
+        self.viewModel?.fetchCharacters(offset: offset, name: name) {
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+                
+                if(self.refreshControl.isRefreshing) {
+                    self.stopRefresher()
+                }
+            }
+        }
+    }
+    
     
     func stopRefresher() {
         self.refreshControl.endRefreshing()
@@ -81,19 +101,29 @@ class CharacterViewController: UIViewController {
 extension CharacterViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        
+        return viewModel?.numberOfCharacters ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.Cell.charactersCell, for: indexPath) as! CharactersCell
+        
+        guard let cellModel = viewModel?.collectionCellModel(indexPath: indexPath) else {
+            return CharactersCell()
+        }
+        
+        cell.configure(cellModel: cellModel)
         
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        // Padding between cell
         let paddingSpace = sectionInsets.left * (itemsPerRow + 1)
         let width = ((collectionView.frame.width - paddingSpace) / itemsPerRow)
+        
         return CGSize(width: width, height: width)
     }
     
