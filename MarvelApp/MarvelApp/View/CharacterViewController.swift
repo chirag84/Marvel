@@ -173,6 +173,8 @@ extension CharacterViewController: UICollectionViewDelegate, UICollectionViewDat
 extension CharacterViewController: UISearchControllerDelegate, UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if !didTapClearKey && searchText.isEmpty {
+            self.viewModel.searchCancelled()
+            
             self.getCharacters(offset: 0)
         }
         // to avoid multiple api call while searching, reload in few seconds after last key press.
@@ -200,7 +202,8 @@ extension CharacterViewController: UISearchControllerDelegate, UISearchBarDelega
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         if !searchBar.text!.isEmpty {
             searchBar.text = ""
-            
+            self.viewModel.searchCancelled()
+
             // reset result if search cancelled
             self.getCharacters(offset: 0)
         }

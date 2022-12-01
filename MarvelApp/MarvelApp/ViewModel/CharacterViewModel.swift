@@ -43,7 +43,7 @@ class CharacterViewModel: CharacterViewModelProtocol {
                 
             case .success(let response):
                 self.hasReachedMaxOfCharacters = response.totalAmount <= offset + Constants.API.limit
-                print(response.totalAmount)
+         
                 response.0.map({ marvel in
                     self.characterModels.append(CharactersCellModel(character: marvel))
                 })
@@ -53,11 +53,15 @@ class CharacterViewModel: CharacterViewModelProtocol {
     }
 
     func searchCharactersByName(name: String, completionHandler: @escaping () -> Void) {
-        self.characterModels = []
+        self.hasReachedMaxOfCharacters = false
         self.fetchCharacters(offset: 0, name: name, completionHandler: completionHandler)
     }
     
     func collectionCellModel(indexPath: IndexPath) -> CharactersCellModelProtocol {
         return characterModels[indexPath.row]
+    }
+    
+    func searchCancelled() {
+        self.hasReachedMaxOfCharacters = false
     }
 }
