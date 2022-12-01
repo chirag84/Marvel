@@ -12,8 +12,9 @@ class NetworkService: NetworkServiceProtocol {
     
     // Authenticat request with public and private keys
     private lazy var defaultParams: [String: Any] = {
-        let timestamp = "\(Date().timeIntervalSinceNow)"
-        let hash = Constants.API.hash
+        let timestamp = String(Date().timeIntervalSince1970 * 1000)
+        let hash = "\(timestamp)\(Constants.API.privateKey)\(Constants.API.publicKey)".md5()
+        print(timestamp)
         return [
             Constants.Key.timestamp: timestamp,
             Constants.Key.hash: hash,
@@ -40,7 +41,7 @@ class NetworkService: NetworkServiceProtocol {
             params[Constants.Key.nameStartsWith] = name
         }
       
-        
+        print("PATH:\(path)- \(offset)")
         AF.request(path,
                    method: .get,
                    parameters: params,

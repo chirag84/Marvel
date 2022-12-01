@@ -22,7 +22,7 @@ struct Constants {
             return string
         }
         
-        static let offset = 20
+        // No. of record fetch limit
         static let limit = 20
     }
         

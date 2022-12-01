@@ -13,6 +13,21 @@ class CharacterViewController: UIViewController {
     
     private let sectionInsets = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: 10.0)
     private let itemsPerRow: CGFloat = 2
+    private var didTapClearKey = false
+    private var isFetching = false
+    private var page = 0
+    
+    lazy var searchController: UISearchController! = {
+        let searchControl = UISearchController(searchResultsController: nil)
+        searchControl.searchBar.placeholder = Constants.Label.searchByCharacter
+        searchControl.searchBar.sizeToFit()
+        searchControl.searchBar.searchTextField.textColor = .white
+        searchControl.searchBar.becomeFirstResponder()
+        searchControl.delegate = self
+        searchControl.searchBar.delegate = self
+        
+        return searchControl
+    }()
     
     lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -56,9 +71,10 @@ class CharacterViewController: UIViewController {
         self.title = Constants.Label.marvelCharacters
         self.viewModel = CharacterViewModel(service: NetworkService())
         setupView()
+        setupSearchBar()
         
         // Fetch characters
-        self.getCharacters(offset: 0)
+        //self.getCharacters(offset: page)
     }
 
     private func setupView() {
@@ -71,15 +87,22 @@ class CharacterViewController: UIViewController {
         collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
     
+    func setupSearchBar() {
+        self.navigationItem.searchController = searchController
+        self.navigationItem.hidesSearchBarWhenScrolling = true
+    }
+    
     @objc func refreshCharacters() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.getCharacters(offset: 0)
+            self.page = 0
+            self.getCharacters(offset: self.page)
         }
         
     }
     
     func getCharacters(offset: Int, name: String? = nil) {
         self.viewModel?.fetchCharacters(offset: offset, name: name) {
+            self.isFetching = false
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
                 
@@ -97,7 +120,7 @@ class CharacterViewController: UIViewController {
 }
 
 
-//MARK: - CollectionView
+//MARK: - Collection View
 extension CharacterViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -133,5 +156,63 @@ extension CharacterViewController: UICollectionViewDelegate, UICollectionViewDat
         return 8.0
     }
     
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if isFetching {
+            return
+        }
+        let scrollThreshold:CGFloat = 30
+        let scrollDelta = (scrollView.contentOffset.y + scrollView.frame.size.height) - scrollView.contentSize.height
+        if  scrollDelta > scrollThreshold {
+            isFetching = true
+            self.getCharacters(offset: self.viewModel.characterModels.count)
+        }
+    }
+}
+
+//MARK: - Search controller delegate
+extension CharacterViewController: UISearchControllerDelegate, UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if !didTapClearKey && searchText.isEmpty {
+            self.getCharacters(offset: 0)
+        }
+        // to avoid multiple api call while searching, reload in few seconds after last key press.
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.reloadSearch(_:)), object: searchBar)
+        perform(#selector(self.reloadSearch(_:)), with: searchBar, afterDelay: 0.75)
+        
+        didTapClearKey = false
+    }
     
+    @objc func reloadSearch(_ searchBar: UISearchBar) {
+        self.performSearch(searchBar)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        
+        didTapClearKey = text.isEmpty
+        
+        return true
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        self.performSearch(searchBar)
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        if !searchBar.text!.isEmpty {
+            searchBar.text = ""
+            
+            // reset result if search cancelled
+            self.getCharacters(offset: 0)
+        }
+    }
+    
+    func performSearch(_ searchBar: UISearchBar) {
+        guard let searchText = searchBar.text, searchText.trimmingCharacters(in: .whitespaces) != "" else {
+            return
+        }
+        // search characters by name
+        self.viewModel.searchCharactersByName(name: searchText) {
+            self.collectionView.reloadData()
+        }
+    }
 }

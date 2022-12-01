@@ -11,6 +11,8 @@ class CharacterViewModel: CharacterViewModelProtocol {
    
     var service: NetworkServiceProtocol?
     var characterModels: [CharactersCellModel] = []
+    var hasReachedMaxOfCharacters: Bool = false
+    
     
     init(service: NetworkService) {
         self.service = service
@@ -21,17 +23,27 @@ class CharacterViewModel: CharacterViewModelProtocol {
     }
     
     func fetchCharacters(offset: Int, name: String? = nil, completionHandler: @escaping () -> Void)  {
+        
+        // Reset records for zero offset
         if offset == 0 {
             self.characterModels = []
         }
         
-        service?.characters(offset: 0, search: name) { [unowned self] result in
+        // Return if fetched max records of characters
+        guard !hasReachedMaxOfCharacters else {
+            completionHandler()
+            return
+        }
+        
+        service?.characters(offset: offset, search: name) { [unowned self] result in
             switch result {
             case .failure(let error):
                 print(error)
                 completionHandler()
                 
             case .success(let response):
+                self.hasReachedMaxOfCharacters = response.totalAmount <= offset + Constants.API.limit
+                print(response.totalAmount)
                 response.0.map({ marvel in
                     self.characterModels.append(CharactersCellModel(character: marvel))
                 })
