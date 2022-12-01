@@ -8,14 +8,13 @@
 import UIKit
 
 class CharacterViewController: UIViewController {
-
+    
     var viewModel: CharacterViewModel!
     
     private let sectionInsets = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: 10.0)
     private let itemsPerRow: CGFloat = 2
     private var didTapClearKey = false
     private var isFetching = false
-    private var page = 0
     
     lazy var searchController: UISearchController! = {
         let searchControl = UISearchController(searchResultsController: nil)
@@ -72,11 +71,8 @@ class CharacterViewController: UIViewController {
         self.viewModel = CharacterViewModel(service: NetworkService())
         setupView()
         setupSearchBar()
-        
-        // Fetch characters
-        //self.getCharacters(offset: page)
     }
-
+    
     private func setupView() {
         view.addSubview(collectionView)
         collectionView.addSubview(refreshControl)
@@ -89,15 +85,14 @@ class CharacterViewController: UIViewController {
     
     func setupSearchBar() {
         self.navigationItem.searchController = searchController
-        self.navigationItem.hidesSearchBarWhenScrolling = true
+        self.navigationItem.hidesSearchBarWhenScrolling = false
     }
     
     @objc func refreshCharacters() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.page = 0
-            self.getCharacters(offset: self.page)
+            // Refresh characters record
+            self.getCharacters(offset: 0)
         }
-        
     }
     
     func getCharacters(offset: Int, name: String? = nil) {
@@ -112,7 +107,6 @@ class CharacterViewController: UIViewController {
             }
         }
     }
-    
     
     func stopRefresher() {
         self.refreshControl.endRefreshing()
@@ -156,6 +150,14 @@ extension CharacterViewController: UICollectionViewDelegate, UICollectionViewDat
         return 8.0
     }
     
+    // MARK: UICollectionView Delegate
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let viewController = CharacterDetailsViewController()
+        let viewModel = CharacterDetailsViewModel(character: self.viewModel.characterModels[indexPath.row].character)
+        viewController.viewModel = viewModel
+        self.navigationController?.pushViewController(viewController, animated: true)
+    }
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if isFetching {
             return
@@ -171,13 +173,14 @@ extension CharacterViewController: UICollectionViewDelegate, UICollectionViewDat
 
 //MARK: - Search controller delegate
 extension CharacterViewController: UISearchControllerDelegate, UISearchBarDelegate {
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if !didTapClearKey && searchText.isEmpty {
             self.viewModel.searchCancelled()
             
             self.getCharacters(offset: 0)
         }
-        // to avoid multiple api call while searching, reload in few seconds after last key press.
+        // To avoid multiple api call while searching, reload in few seconds after last key press.
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.reloadSearch(_:)), object: searchBar)
         perform(#selector(self.reloadSearch(_:)), with: searchBar, afterDelay: 0.75)
         
@@ -203,8 +206,8 @@ extension CharacterViewController: UISearchControllerDelegate, UISearchBarDelega
         if !searchBar.text!.isEmpty {
             searchBar.text = ""
             self.viewModel.searchCancelled()
-
-            // reset result if search cancelled
+            
+            // Reset result if search cancelled
             self.getCharacters(offset: 0)
         }
     }
@@ -213,7 +216,7 @@ extension CharacterViewController: UISearchControllerDelegate, UISearchBarDelega
         guard let searchText = searchBar.text, searchText.trimmingCharacters(in: .whitespaces) != "" else {
             return
         }
-        // search characters by name
+        // Search characters by name
         self.viewModel.searchCharactersByName(name: searchText) {
             self.collectionView.reloadData()
         }

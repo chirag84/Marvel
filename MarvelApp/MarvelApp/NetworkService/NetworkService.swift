@@ -33,15 +33,16 @@ class NetworkService: NetworkServiceProtocol {
     ///   - limit: the limit of data to retrive
     ///   - completion: returns an array of the model requested and a boolean that informs if has reached the maximum amount of data of that model
     private func genericRequest<T: Decodable>(path: String, offset: Int, search: String?, limit: Int, completion: @escaping(Result<(T, totalAmount: Int)>) -> Void) {
+        
         var params = defaultParams
         params[Constants.Key.limit] = limit
         params[Constants.Key.offset] = offset
         
+        // Search result if name is not empty
         if let name = search, !name.isEmpty {
             params[Constants.Key.nameStartsWith] = name
         }
       
-        print("PATH:\(path)- \(offset)")
         AF.request(path,
                    method: .get,
                    parameters: params,

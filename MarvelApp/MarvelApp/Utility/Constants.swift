@@ -37,11 +37,14 @@ struct Constants {
 
     struct Label {
         static let marvelCharacters = "Marvel Characters"
+        static let characterDetails = "Character Details"
         static let searchByCharacter = "Search by character"
     }
     
     struct Cell {
         static let charactersCell = "CharactersCell"
+        static let characterDeatilsCell = "CharacterDeatilsCell"
+        static let comicsCell = "ComicsCell"
     }
     
 }

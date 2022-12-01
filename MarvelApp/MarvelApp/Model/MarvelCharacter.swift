@@ -12,6 +12,7 @@ struct MarvelCharacter: Codable {
     var name: String
     var thumbnail: Thumbnail
     var description: String
+    var comics: Comics
 }
 
 struct Thumbnail: Codable {

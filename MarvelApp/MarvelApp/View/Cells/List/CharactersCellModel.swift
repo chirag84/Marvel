@@ -8,16 +8,19 @@
 import Foundation
 
 protocol CharactersCellModelProtocol {
+    var character: MarvelCharacter {get}
     var titleText: String {get}
     var imagePath: String {get}
 }
 
 class CharactersCellModel: CharactersCellModelProtocol {
-    
+    var character: MarvelCharacter
     var titleText: String
     var imagePath: String
     
     init(character: MarvelCharacter) {
+        self.character = character
+        
         self.titleText = character.name
         self.imagePath = character.thumbnail.urlPath()
     }
