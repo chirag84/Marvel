@@ -68,7 +68,9 @@ class CharacterViewController: UIViewController {
         // Do any additional setup after loading the view.
         
         self.title = Constants.Label.marvelCharacters
-        self.viewModel = CharacterViewModel(service: NetworkService())
+        
+        // Init network sercice and core data
+        self.viewModel = CharacterViewModel(service: NetworkService(), dataService: CoreDataService())
         setupView()
         setupSearchBar()
     }

@@ -47,5 +47,8 @@ struct Constants {
         static let comicsCell = "ComicsCell"
     }
     
+    struct Entity {
+        static let name = "Characters"
+    }
 }
 

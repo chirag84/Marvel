@@ -8,14 +8,15 @@
 import Foundation
 
 class CharacterViewModel: CharacterViewModelProtocol {
-   
+    var dataService: CoreDataServiceProtocol?
     var service: NetworkServiceProtocol?
     var characterModels: [CharactersCellModel] = []
     var hasReachedMaxOfCharacters: Bool = false
     
     
-    init(service: NetworkService) {
+    init(service: NetworkService, dataService: CoreDataService) {
         self.service = service
+        self.dataService = dataService
     }
     
     var numberOfCharacters: Int {
@@ -44,6 +45,13 @@ class CharacterViewModel: CharacterViewModelProtocol {
             case .success(let response):
                 self.hasReachedMaxOfCharacters = response.totalAmount <= offset + Constants.API.limit
          
+                // Save characters to local database
+                dataService?.saveCharactersData(characters: response.0, completion: { status in
+                    if(status){
+                        print("saved successfully!!")
+                    }
+                })
+                
                 response.0.map({ marvel in
                     self.characterModels.append(CharactersCellModel(character: marvel))
                 })
