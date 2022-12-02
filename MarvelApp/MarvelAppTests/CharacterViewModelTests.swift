@@ -12,11 +12,13 @@ import XCTest
 class CharacterViewModelTests: XCTestCase {
     private var viewModel: CharacterViewModel!
     private var networkService: NetworkService!
+    private var dataService: CoreDataService!
 
     override func setUp() {
         super.setUp()
         networkService = NetworkService()
-        viewModel = CharacterViewModel(service: networkService)
+        dataService = CoreDataService()
+        viewModel = CharacterViewModel(service: networkService, dataService: dataService)
     }
     
     override func tearDown() {
