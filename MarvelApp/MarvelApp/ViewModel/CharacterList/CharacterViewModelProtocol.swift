@@ -14,7 +14,5 @@ protocol CharacterViewModelProtocol {
     var numberOfCharacters: Int {get}
    
     func fetchCharacters(offset: Int, name: String?, completionHandler: @escaping () -> Void)
-    
     func collectionCellModel(indexPath: IndexPath) -> CharactersCellModelProtocol
-    
 }

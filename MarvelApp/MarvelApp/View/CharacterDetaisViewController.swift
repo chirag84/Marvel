@@ -80,6 +80,7 @@ extension CharacterDetailsViewController: UICollectionViewDelegate, UICollection
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
+            // Character Info cell
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.Cell.characterDeatilsCell, for: indexPath) as! CharacterDetailsCell
             
             guard let cellModel = viewModel?.collectionCellModel(indexPath: indexPath) else {
@@ -87,10 +88,10 @@ extension CharacterDetailsViewController: UICollectionViewDelegate, UICollection
             }
             
             cell.configure(cellModel: cellModel)
-            
             return cell
             
         } else {
+            // Comics cell
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.Cell.comicsCell, for: indexPath) as! ComicsCell
             guard let cellModel = viewModel?.comicCellModel(indexPath: indexPath) else {
                 return ComicsCell()

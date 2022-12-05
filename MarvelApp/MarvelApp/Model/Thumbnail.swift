@@ -7,14 +7,6 @@
 
 import Foundation
 
-struct MarvelCharacter: Codable {
-    var id: Int
-    var name: String
-    var thumbnail: Thumbnail
-    var description: String
-    var comics: Comics
-}
-
 struct Thumbnail: Codable {
     var path: String
     var `extension`: String

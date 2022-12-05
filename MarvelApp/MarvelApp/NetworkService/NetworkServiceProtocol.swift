@@ -9,6 +9,7 @@ import Foundation
 
 protocol NetworkServiceProtocol {
      func characters(offset: Int?, search: String?, completion: @escaping(Result<([MarvelCharacter], totalAmount: Int)>) -> Void)
+     func searchLocalCharacter(text: String, completion:  @escaping(Result<([MarvelCharacter], totalAmount: Int)>) -> Void)
 }
 
 enum Result<T> {

@@ -8,23 +8,14 @@
 import Foundation
 
 class CharacterDetailsViewModel: CharacterDetailsViewModelProtocol {
- 
+    
     var selectedCharacter: MarvelCharacter
     var characterModels: [CharacterDetailsCellModel] = []
     var comicsModels: [ComicsCellModel] = []
     
     init(character: MarvelCharacter) {
         self.selectedCharacter = character
-        characterModels.append(CharacterDetailsCellModel(character: selectedCharacter))
-        
-        self.selectedCharacter.comics.items.forEach { items in
-            
-            //On the Character detail page list the first five Comics of that character.
-            if(comicsModels.count == 5) {
-                return
-            }
-            comicsModels.append(ComicsCellModel(resource: items))
-        }
+        characterModels.append(CharacterDetailsCellModel(character: selectedCharacter, delegate: self))
     }
    
     var numberOfComics: Int {
@@ -37,5 +28,15 @@ class CharacterDetailsViewModel: CharacterDetailsViewModelProtocol {
     
     func comicCellModel(indexPath: IndexPath) -> ComicsCellModelProtocol {
         return comicsModels[indexPath.row]
+    }
+}
+
+extension CharacterDetailsViewModel: CharacterDetailsCellModelDelegate {
+    func addToFavoriteTapped(_ isFavorite: Bool) {
+        CoreDataService.shared.addToFavorite(characterId: Int(selectedCharacter.id), isFavorite: isFavorite) { success in
+            if(success) {
+                NotificationCenter.default.post(name: NSNotification.Name("didChangeFavorite"), object: nil)
+            }
+        }
     }
 }

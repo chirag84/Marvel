@@ -9,31 +9,124 @@ import UIKit
 import CoreData
 
 
-protocol CoreDataServiceProtocol {
-    func saveCharactersData(characters: [MarvelCharacter]?,completion: @escaping (Bool) -> ())
-    func retrieveCharactersData() -> [MarvelCharacter]? 
-}
-
-class CoreDataService: CoreDataServiceProtocol {
+class CoreDataService {
+    static let shared = CoreDataService()
     
-    func saveCharactersData(characters: [MarvelCharacter]?, completion: @escaping (Bool) -> ()) {
+    // MARK: - Core Data stack
+    
+    lazy var persistentContainer: NSPersistentContainer = {
+        /*
+         The persistent container for the application. This implementation
+         creates and returns a container, having loaded the store for the
+         application to it. This property is optional since there are legitimate
+         error conditions that could cause the creation of the store to fail.
+         */
+        let container = NSPersistentContainer(name: "MarvelApp")
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                
+                /*
+                 Typical reasons for an error here include:
+                 * The parent directory does not exist, cannot be created, or disallows writing.
+                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
+                 * The device is out of space.
+                 * The store could not be migrated to the current model version.
+                 Check the error message to determine what the actual problem was.
+                 */
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        return container
+    }()
+    
+    // MARK: - Core Data Saving support
+    
+    func saveContext () {
+        let context = persistentContainer.viewContext
         
-        //As we know that container is set up in the AppDelegates so we need to refer that container.
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
+        }
+    }
+    
+    class func getFavouriteCharacter(_ characterId: Int)-> Bool {
+        let context = CoreDataService.shared.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Constants.Entity.favorite)
+        // Result request limit
+        fetchRequest.fetchLimit = 1
+        // Remove fault objects
+        fetchRequest.returnsObjectsAsFaults = false
+        /// Search by marvel character id, return `true` if favorite is equal to true
+        fetchRequest.predicate = NSPredicate(format: "id = %d AND isFavorite == %@",
+                                             argumentArray:[characterId, NSNumber(value: true)])
         
-        //We need to create a context from this container
-        let managedContext = appDelegate.persistentContainer.viewContext
+        do {
+            let results = try context.fetch(fetchRequest)
+            if results.count > 0 {
+                if let favorite = results.first as? Favorite {
+                    return favorite.isFavorite
+                }
+            }
+        } catch {
+            print("Fetch Failed: \(error)")
+        }
+        return false
         
-        //Now let’s create an entity and new user records.
-        let charactersEntity = NSEntityDescription.entity(forEntityName: Constants.Entity.name, in: managedContext)!
+    }
+    
+    // First check if character has bookmarked or not
+    // If entity exist then update the bookmarked status
+    func checkIfFavoriteCharacterExist(characterId: Int) -> Bool {
+        let managedContext = persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: Constants.Entity.favorite)
+        fetchRequest.fetchLimit =  1
+        fetchRequest.predicate = NSPredicate(format: "id == %d" ,characterId)
         
-        characters?.forEach {
-            let character = NSManagedObject(entity: charactersEntity, insertInto: managedContext)
-            character.setValue($0.id, forKey: "id")
-            character.setValue($0.name, forKey: "name")
-            character.setValue($0.thumbnail, forKey: "thumbnail")
-            character.setValue($0.description, forKey: "descriptions")
-            character.setValue($0.comics, forKey: "comics")
+        do {
+            let count = try managedContext.count(for: fetchRequest)
+            if count > 0 {
+                return true
+            }
+        }catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+            return false
+        }
+
+        return false
+    }
+    
+    func addToFavorite(characterId: Int, isFavorite: Bool, completion: @escaping (Bool) -> ()) {
+        // Create a context from this container
+        let managedContext = persistentContainer.viewContext
+        let isFavoriteEntityExist = self.checkIfFavoriteCharacterExist(characterId: characterId)
+        
+        // Update Bookmarked status
+        if(isFavoriteEntityExist){
+            let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest.init(entityName: Constants.Entity.favorite)
+            fetchRequest.predicate = NSPredicate(format: "id == %d", characterId)
+            do {
+                let favorite = try managedContext.fetch(fetchRequest)
+                let updateFavorite = favorite[0] as! NSManagedObject
+                updateFavorite.setValue(isFavorite, forKey: "isFavorite")
+            }
+            catch {
+                completion(false)
+            }
+        }else{
+            // Create an entity for Bookmarked character
+            let favoriteEntity = NSEntityDescription.entity(forEntityName: Constants.Entity.favorite, in: managedContext)!
+            let favorite = NSManagedObject(entity: favoriteEntity, insertInto: managedContext)
+            favorite.setValue(characterId, forKey: "id")
+            favorite.setValue(isFavorite, forKey: "isFavorite")
         }
         
         do {
@@ -45,37 +138,33 @@ class CoreDataService: CoreDataServiceProtocol {
             completion(false)
         }
     }
-    
-    func retrieveCharactersData() -> [MarvelCharacter]? {
+}
+
+extension NSManagedObjectContext {
+    func fetchData<T: NSManagedObject>(entity: T.Type, offset: Int, predicate: NSPredicate? = nil) -> Array<Any> {
         
-        //As we know that container is set up in the AppDelegates so we need to refer that container.
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return [] }
+        let entityName = String(describing: entity.self)
+        let entityDescription = NSEntityDescription.entity(forEntityName: entityName, in: self)
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
+        fetchRequest.returnsObjectsAsFaults = false
+        fetchRequest.entity = entityDescription
         
-        //We need to create a context from this container
-        let managedContext = appDelegate.persistentContainer.viewContext
+        // The limit of data to retrive
+        fetchRequest.fetchLimit = Constants.API.limit
         
-        //Prepare the request of type NSFetchRequest  for the entity
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Constants.Entity.name)
+        // The start point from where to get the no. of data
+        fetchRequest.fetchOffset = offset
         
-        var characters = [MarvelCharacter]()
-        
+        /// If predicate found then filter based on passed offset
+        if let predicate = predicate {
+            fetchRequest.predicate = predicate
+        }
         do {
-            let result = try managedContext.fetch(fetchRequest)
-            
-            for data in result as! [NSManagedObject] {
-               
-                characters.append(MarvelCharacter(id: data.value(forKey: "id") as? Int ?? 0,
-                                                  name: data.value(forKey: "name") as? String ?? "",
-                                                  thumbnail: data.value(forKey: "thumbnail") as! Thumbnail,
-                                                  description: data.value(forKey: "descriptions") as? String ?? "",
-                                                  comics: data.value(forKey: "comics") as! Comics))
-            }
-            
-            return characters
-            
+            let result = try self.fetch(fetchRequest)
+            return result
         } catch {
-            print("Failed")
-            return []
+            fatalError("Failed to fetch \(entityName): \(error)")
         }
     }
+    
 }

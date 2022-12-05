@@ -15,6 +15,8 @@ class CharacterViewController: UIViewController {
     private let itemsPerRow: CGFloat = 2
     private var didTapClearKey = false
     private var isFetching = false
+    private var selectedIndex = IndexPath()
+  
     
     lazy var searchController: UISearchController! = {
         let searchControl = UISearchController(searchResultsController: nil)
@@ -69,11 +71,17 @@ class CharacterViewController: UIViewController {
         
         self.title = Constants.Label.marvelCharacters
         
-        // Init network sercice and core data
-        self.viewModel = CharacterViewModel(service: NetworkService(), dataService: CoreDataService())
+        /// Add observer to update the favorite character status
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(reloadToUpdateFavorite),
+                                               name:  NSNotification.Name("didChangeFavorite"), object: nil)
+        
+        // Init Network service
+        self.viewModel = CharacterViewModel(service: NetworkService())
         setupView()
         setupSearchBar()
     }
+
     
     private func setupView() {
         view.addSubview(collectionView)
@@ -94,6 +102,13 @@ class CharacterViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             // Refresh characters record
             self.getCharacters(offset: 0)
+        }
+    }
+    
+    @objc func reloadToUpdateFavorite() {
+        DispatchQueue.main.async {
+            self.getCharacters(offset: self.viewModel.characterModels.count - Constants.API.limit)
+            self.collectionView.reloadItems(at: [self.selectedIndex])
         }
     }
     
@@ -128,6 +143,7 @@ extension CharacterViewController: UICollectionViewDelegate, UICollectionViewDat
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.Cell.charactersCell, for: indexPath) as! CharactersCell
         
+        // Set character cell model
         guard let cellModel = viewModel?.collectionCellModel(indexPath: indexPath) else {
             return CharactersCell()
         }
@@ -154,18 +170,24 @@ extension CharacterViewController: UICollectionViewDelegate, UICollectionViewDat
     
     // MARK: UICollectionView Delegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let viewController = CharacterDetailsViewController()
-        let viewModel = CharacterDetailsViewModel(character: self.viewModel.characterModels[indexPath.row].character)
-        viewController.viewModel = viewModel
-        self.navigationController?.pushViewController(viewController, animated: true)
+       
+        if let character =  viewModel?.collectionCellModel(indexPath: indexPath).character {
+         
+            let viewController = CharacterDetailsViewController()
+            let viewModel = CharacterDetailsViewModel(character: character)
+            viewController.viewModel = viewModel
+            self.selectedIndex = indexPath
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if isFetching {
-            return
-        }
+       
+        if isFetching { return }
+        
         let scrollThreshold:CGFloat = 30
         let scrollDelta = (scrollView.contentOffset.y + scrollView.frame.size.height) - scrollView.contentSize.height
+       
         if  scrollDelta > scrollThreshold {
             isFetching = true
             self.getCharacters(offset: self.viewModel.characterModels.count)
@@ -184,7 +206,10 @@ extension CharacterViewController: UISearchControllerDelegate, UISearchBarDelega
         }
         // To avoid multiple api call while searching, reload in few seconds after last key press.
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.reloadSearch(_:)), object: searchBar)
-        perform(#selector(self.reloadSearch(_:)), with: searchBar, afterDelay: 0.75)
+        
+        // Add delay search if internet is connected
+        let networkConnection = NetworkService.isConnectedToInternet()
+        perform(#selector(self.reloadSearch(_:)), with: searchBar, afterDelay: networkConnection ? 0.75 : 0)
         
         didTapClearKey = false
     }
@@ -220,7 +245,9 @@ extension CharacterViewController: UISearchControllerDelegate, UISearchBarDelega
         }
         // Search characters by name
         self.viewModel.searchCharactersByName(name: searchText) {
-            self.collectionView.reloadData()
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+            }
         }
     }
 }

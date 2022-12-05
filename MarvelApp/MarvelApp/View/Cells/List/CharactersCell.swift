@@ -56,7 +56,18 @@ class CharactersCell: UICollectionViewCell {
         return label
     }()
 
-   
+    lazy var favoriteButton: UIButton! = {
+        let button = UIButton(frame: .zero)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.isUserInteractionEnabled = true
+        button.backgroundColor = .clear
+        button.setImage(UIImage(systemName: "star"), for: .normal)
+        button.setImage(UIImage(systemName: "star.fill"), for: .selected)
+        button.tintColor = .red
+        button.isHidden = true
+        
+        return button
+    }()
   
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -69,12 +80,18 @@ class CharactersCell: UICollectionViewCell {
         
         addSubview(containerView)
         containerView.addSubview(stackView)
+        containerView.addSubview(favoriteButton)
         
         containerView.topAnchor.constraint(equalTo: topAnchor, constant: 5).isActive = true
         containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5).isActive = true
         containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -5).isActive = true
         containerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5).isActive = true
         
+        favoriteButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 5).isActive = true
+        favoriteButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -5).isActive = true
+        favoriteButton.heightAnchor.constraint(equalToConstant: 42).isActive = true
+        favoriteButton.widthAnchor.constraint(equalToConstant: 42).isActive = true
+
         stackView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 5).isActive = true
         stackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 5).isActive = true
         stackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -5).isActive = true
@@ -92,11 +109,13 @@ class CharactersCell: UICollectionViewCell {
         // Set character title
         titleLabel.text = self.viewModel?.titleText
         
-        // Set thumb character image
+        // Set character image
         if let path = self.viewModel?.imagePath {
             characterImageView.kf.setImage(with: URL(string: path))
         }
         
+        favoriteButton.isSelected = self.viewModel?.isFavorite ?? false
+        favoriteButton.isHidden = favoriteButton.isSelected ? false : true
     }
     
     

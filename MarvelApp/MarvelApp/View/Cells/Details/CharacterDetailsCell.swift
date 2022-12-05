@@ -65,6 +65,19 @@ class CharacterDetailsCell: UICollectionViewCell {
         label.numberOfLines = 0
         return label
     }()
+    
+    lazy var favoriteButton: UIButton! = {
+        let button = UIButton(frame: .zero)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.isUserInteractionEnabled = true
+        button.backgroundColor = .clear
+        button.setImage(UIImage(systemName: "star"), for: .normal)
+        button.setImage(UIImage(systemName: "star.fill"), for: .selected)
+        button.tintColor = .red
+        button.addTarget(self, action: #selector(addToFavoriteTapped), for: .touchUpInside)
+        
+        return button
+    }()
    
   
     override init(frame: CGRect) {
@@ -77,11 +90,11 @@ class CharacterDetailsCell: UICollectionViewCell {
         backgroundColor = UIColor.clear
         
         addSubview(containerView)
-        //containerView.addSubview(stackView)
         
         containerView.addSubview(characterImageView)
         containerView.addSubview(titleLabel)
         containerView.addSubview(descriptionLabel)
+        containerView.addSubview(favoriteButton)
         
         containerView.topAnchor.constraint(equalTo: topAnchor, constant: 5).isActive = true
         containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
@@ -108,6 +121,11 @@ class CharacterDetailsCell: UICollectionViewCell {
         descriptionLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -10).isActive = true
         descriptionLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 21).isActive = true
         descriptionLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -5).isActive = true
+        
+        favoriteButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 10).isActive = true
+        favoriteButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -10).isActive = true
+        favoriteButton.heightAnchor.constraint(equalToConstant: 42).isActive = true
+        favoriteButton.widthAnchor.constraint(equalToConstant: 42).isActive = true
     }
     
     func configure(cellModel: CharacterDetailsCellModelProtocol) {
@@ -117,13 +135,20 @@ class CharacterDetailsCell: UICollectionViewCell {
         titleLabel.text = self.viewModel?.titleText
         
         // Set thumb character image
-        if let path = self.viewModel?.imagePath {
+        if let path = self.viewModel?.imagePath, !path.isEmpty {
             characterImageView.kf.setImage(with: URL(string: path))
         }
+        
+        favoriteButton.isSelected = cellModel.isFavorite
+        
         
         descriptionLabel.text = self.viewModel?.descriptionText
     }
     
+    @objc func addToFavoriteTapped(_ sender: UIButton) {
+        sender.isSelected = !sender.isSelected
+        viewModel?.addToFavoriteTapped(sender.isSelected)
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

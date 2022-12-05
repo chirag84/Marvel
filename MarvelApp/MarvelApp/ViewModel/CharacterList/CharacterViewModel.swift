@@ -6,17 +6,15 @@
 //
 
 import Foundation
+import CoreData
 
 class CharacterViewModel: CharacterViewModelProtocol {
-    var dataService: CoreDataServiceProtocol?
     var service: NetworkServiceProtocol?
     var characterModels: [CharactersCellModel] = []
     var hasReachedMaxOfCharacters: Bool = false
     
-    
-    init(service: NetworkService, dataService: CoreDataService) {
+    init(service: NetworkService) {
         self.service = service
-        self.dataService = dataService
     }
     
     var numberOfCharacters: Int {
@@ -24,45 +22,86 @@ class CharacterViewModel: CharacterViewModelProtocol {
     }
     
     func fetchCharacters(offset: Int, name: String? = nil, completionHandler: @escaping () -> Void)  {
-        
-        // Reset records for zero offset
-        if offset == 0 {
-            self.characterModels = []
-        }
-        
-        // Return if fetched max records of characters
-        guard !hasReachedMaxOfCharacters else {
-            completionHandler()
-            return
-        }
-        
-        service?.characters(offset: offset, search: name) { [unowned self] result in
-            switch result {
-            case .failure(let error):
-                print(error)
-                completionHandler()
-                
-            case .success(let response):
-                self.hasReachedMaxOfCharacters = response.totalAmount <= offset + Constants.API.limit
-         
-                // Save characters to local database
-                dataService?.saveCharactersData(characters: response.0, completion: { status in
-                    if(status){
-                        print("saved successfully!!")
-                    }
-                })
-                
-                response.0.map({ marvel in
-                    self.characterModels.append(CharactersCellModel(character: marvel))
-                })
-                completionHandler()
+       
+        if NetworkService.isConnectedToInternet() {
+            
+            // Reset records for zero offset
+            if offset == 0 {
+                self.characterModels = []
             }
+            
+            // Return if fetched max records of characters
+            guard !hasReachedMaxOfCharacters else {
+                completionHandler()
+                return
+            }
+            
+            service?.characters(offset: offset, search: name) { [unowned self] result in
+                switch result {
+                case .failure(let error):
+                    print(error)
+                    completionHandler()
+                    
+                case .success(let response):
+                    self.hasReachedMaxOfCharacters = response.totalAmount <= offset + Constants.API.limit
+                                    
+                    let characters = self.getCharactersData(offset: offset)
+                    characters.forEach { marvel in
+                        self.characterModels.append(CharactersCellModel(character: marvel))
+                    }
+                    completionHandler()
+                }
+            }
+        } else {
+            //Todo: show local result
+            if offset == 0 {
+                self.characterModels = []
+            }
+            
+            let characters = self.getCharactersData(offset: offset)
+            characters.forEach { marvel in
+                self.characterModels.append(CharactersCellModel(character: marvel))
+            }
+            completionHandler()
         }
+        
+        
+    }
+    
+    // Search character form local database
+    func searchLocalCharacters(text: String, completionHandler: @escaping () -> Void) {
+        service?.searchLocalCharacter(text: text, completion: { result in
+            DispatchQueue.main.async {
+                self.characterModels = []
+                switch result {
+                case .success((let characters, _ )):
+                    characters.forEach { marvel in
+                        self.characterModels.append(CharactersCellModel(character: marvel))
+                    }
+                    completionHandler()
+                    break
+                case .failure(let error):
+                    print(error)
+                    completionHandler()
+                    break
+                }
+            }
+        })
+    }
+    
+    // Get Marvel characters by offset/page
+    func getCharactersData(offset: Int) -> [MarvelCharacter] {
+        let context = CoreDataService.shared.persistentContainer.viewContext
+        let characterData = context.fetchData(entity: MarvelCharacter.self, offset: offset)
+        if let characters = characterData as? [MarvelCharacter] {
+            return characters
+        }
+        return []
     }
 
     func searchCharactersByName(name: String, completionHandler: @escaping () -> Void) {
         self.hasReachedMaxOfCharacters = false
-        self.fetchCharacters(offset: 0, name: name, completionHandler: completionHandler)
+        self.searchLocalCharacters(text: name, completionHandler: completionHandler)
     }
     
     func collectionCellModel(indexPath: IndexPath) -> CharactersCellModelProtocol {

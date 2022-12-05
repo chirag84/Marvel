@@ -7,6 +7,7 @@
 
 import Foundation
 import Alamofire
+import CoreData
 
 class NetworkService: NetworkServiceProtocol {
     
@@ -22,6 +23,10 @@ class NetworkService: NetworkServiceProtocol {
         ]
     }()
     
+    /// Internet rechability checking
+    class func isConnectedToInternet() -> Bool {
+        return NetworkReachabilityManager()?.isReachable ?? false
+    }
     
     func characters(offset: Int? = 0, search: String?, completion: @escaping(Result<([MarvelCharacter], totalAmount: Int)>) -> Void) {
         genericRequest(path: Constants.API.characters, offset: offset!, search: search, limit: Constants.API.limit, completion: completion)
@@ -57,37 +62,56 @@ class NetworkService: NetworkServiceProtocol {
                         completion(.failure(ErrorMessage.invalidData))
                         return
                     }
-                    let result = try JSONDecoder().decode(NetworkResponse<T>.self, from: data)
-                    completion(.success((result.results, result.total)))
-                } catch {
-                    completion(.failure(error))
+                    self.saveCharacterDataToDatabase(data: data, completion: completion)
                 }
             case .failure(let error):
                 completion(.failure(error))
             }
         }
     }
-}
-
-
-// NetworkResponse to deal with general response from Marvel API
-struct NetworkResponse<T: Decodable>: Decodable {
-    let results: T
-    let total: Int
     
-    enum CodingKeys: String, CodingKey {
-        case data
+    
+    func saveCharacterDataToDatabase<T: Decodable>(data: Data, completion: @escaping(Result<(T, totalAmount: Int)>) -> Void) {
+        
+        CoreDataService.shared.persistentContainer.performBackgroundTask { (managedObjectContext) in
+            
+            // To avoid changes conflict in memory
+            managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            
+            let decoder = JSONDecoder()
+            if let context = CodingUserInfoKey.context {
+                decoder.userInfo[context] = managedObjectContext
+            }
+            
+            do {
+                let response = try decoder.decode(NetworkResponse<T>.self, from: data)
+                
+                // Save to local database
+                if managedObjectContext.hasChanges {
+                    try managedObjectContext.save()
+                }
+                print(response.results.self)
+                completion(.success((response.results, response.total)))
+               
+            } catch {
+                print(error)
+                completion(.failure(error))
+            }
+        }
     }
     
-    enum AdditionalInfoKeys: String, CodingKey {
-        case results
-        case total
+    // Search marvel character by name
+    func searchLocalCharacter(text: String,
+                              completion:  @escaping(Result<([MarvelCharacter], totalAmount: Int)>) -> Void) {
+        
+        // Predicate search by name
+        let predicate = NSPredicate(format: "name CONTAINS[cd] %@", text)
+        
+        if let characters = CoreDataService.shared.persistentContainer.viewContext.fetchData(entity: MarvelCharacter.self, offset: 0, predicate: predicate) as? [MarvelCharacter] {
+            completion(.success((characters, totalAmount: characters.count)))
+        } else {
+            completion(.failure(ErrorMessage.invalidData))
+        }
     }
     
-    init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        let additionalInfo = try values.nestedContainer(keyedBy: AdditionalInfoKeys.self, forKey: .data)
-        results = try additionalInfo.decode(T.self, forKey: .results)
-        total = try additionalInfo.decode(Int.self, forKey: .total)
-    }
 }

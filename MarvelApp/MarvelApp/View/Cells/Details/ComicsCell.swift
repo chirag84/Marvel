@@ -92,7 +92,7 @@ class ComicsCell: UICollectionViewCell {
         // Set character title
         titleLabel.text = self.viewModel?.titleText
         
-        // Set thumb character image
+        // Set comic image
         if let path = self.viewModel?.imagePath {
             print(path)
             comicImageView.kf.setImage(with: URL(string: "\(path).jpg"))

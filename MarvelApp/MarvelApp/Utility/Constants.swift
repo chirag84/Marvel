@@ -14,8 +14,7 @@ struct Constants {
         static let characters = "\(Constants.API.baseUrl)/characters"
         static let privateKey = "cd3365f42c69f1435caa8383b2b9e82ecccfca78"
         static let publicKey = "f7dd6da14fb22dc378cabc827864c51a"
-        static let timestamp = Date().timeIntervalSince1970
-        
+         
         static var hash:String {
             let timestamp = "\(Date().timeIntervalSinceNow)"
             let string = "\(timestamp)\(Constants.API.privateKey)\(Constants.API.publicKey)".md5()
@@ -48,7 +47,8 @@ struct Constants {
     }
     
     struct Entity {
-        static let name = "Characters"
+        static let character = "MarvelCharacter"
+        static let favorite = "Favorite"
     }
 }
 
