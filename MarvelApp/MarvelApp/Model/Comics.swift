@@ -7,12 +7,12 @@
 
 import Foundation
 
-struct Comics: Codable {
-    var available: Int
-    var collectionURI: String
-    var items: [Resource]
-    var returned: Int
-}
+//struct Comics: Codable {
+//    var available: Int
+//    var collectionURI: String
+//    var items: [Resource]
+//    var returned: Int
+//}
 
 struct Resource: Codable {
     var resourceURI: String

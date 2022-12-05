@@ -30,6 +30,10 @@
 		148E9A46293DBDC700F4CFE3 /* Favorite+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148E9A42293DBDC700F4CFE3 /* Favorite+CoreDataProperties.swift */; };
 		148E9A48293DBF1A00F4CFE3 /* CodingUserInfoKey+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148E9A47293DBF1A00F4CFE3 /* CodingUserInfoKey+Extension.swift */; };
 		148E9A4C293DC3C000F4CFE3 /* NetworkResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148E9A4B293DC3C000F4CFE3 /* NetworkResponse.swift */; };
+		148E9A73293DED8E00F4CFE3 /* ComicItems+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148E9A6F293DED8D00F4CFE3 /* ComicItems+CoreDataProperties.swift */; };
+		148E9A74293DED8E00F4CFE3 /* Comics+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148E9A70293DED8D00F4CFE3 /* Comics+CoreDataProperties.swift */; };
+		148E9A75293DED8E00F4CFE3 /* ComicItems+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148E9A71293DED8D00F4CFE3 /* ComicItems+CoreDataClass.swift */; };
+		148E9A76293DED8E00F4CFE3 /* Comics+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148E9A72293DED8D00F4CFE3 /* Comics+CoreDataClass.swift */; };
 		1493BD0F29384A4F00994242 /* CharacterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1493BD0E29384A4F00994242 /* CharacterViewModel.swift */; };
 		1493BD1129384C2300994242 /* CharacterViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1493BD1029384C2300994242 /* CharacterViewModelProtocol.swift */; };
 		1493BD1429384C9B00994242 /* CharactersCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1493BD1329384C9B00994242 /* CharactersCell.swift */; };
@@ -92,6 +96,10 @@
 		148E9A42293DBDC700F4CFE3 /* Favorite+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Favorite+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		148E9A47293DBF1A00F4CFE3 /* CodingUserInfoKey+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CodingUserInfoKey+Extension.swift"; sourceTree = "<group>"; };
 		148E9A4B293DC3C000F4CFE3 /* NetworkResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkResponse.swift; sourceTree = "<group>"; };
+		148E9A6F293DED8D00F4CFE3 /* ComicItems+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ComicItems+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		148E9A70293DED8D00F4CFE3 /* Comics+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Comics+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		148E9A71293DED8D00F4CFE3 /* ComicItems+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ComicItems+CoreDataClass.swift"; sourceTree = "<group>"; };
+		148E9A72293DED8D00F4CFE3 /* Comics+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Comics+CoreDataClass.swift"; sourceTree = "<group>"; };
 		1493BD0E29384A4F00994242 /* CharacterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterViewModel.swift; sourceTree = "<group>"; };
 		1493BD1029384C2300994242 /* CharacterViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterViewModelProtocol.swift; sourceTree = "<group>"; };
 		1493BD1329384C9B00994242 /* CharactersCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersCell.swift; sourceTree = "<group>"; };
@@ -217,6 +225,10 @@
 				148E9A42293DBDC700F4CFE3 /* Favorite+CoreDataProperties.swift */,
 				148E9A3F293DBDC600F4CFE3 /* MarvelCharacter+CoreDataClass.swift */,
 				148E9A41293DBDC700F4CFE3 /* MarvelCharacter+CoreDataProperties.swift */,
+				148E9A72293DED8D00F4CFE3 /* Comics+CoreDataClass.swift */,
+				148E9A70293DED8D00F4CFE3 /* Comics+CoreDataProperties.swift */,
+				148E9A71293DED8D00F4CFE3 /* ComicItems+CoreDataClass.swift */,
+				148E9A6F293DED8D00F4CFE3 /* ComicItems+CoreDataProperties.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -586,6 +598,7 @@
 				148E9A48293DBF1A00F4CFE3 /* CodingUserInfoKey+Extension.swift in Sources */,
 				142246382937B2DC0095D4C9 /* CharacterViewController.swift in Sources */,
 				14EDD2AA2938C7DC00A67252 /* CharacterDetailsViewModelProtocol.swift in Sources */,
+				148E9A76293DED8E00F4CFE3 /* Comics+CoreDataClass.swift in Sources */,
 				148E9A3C293DBCCE00F4CFE3 /* Marvel.swift in Sources */,
 				1493BD1129384C2300994242 /* CharacterViewModelProtocol.swift in Sources */,
 				142246342937B2DC0095D4C9 /* AppDelegate.swift in Sources */,
@@ -593,6 +606,7 @@
 				148E9A43293DBDC700F4CFE3 /* MarvelCharacter+CoreDataClass.swift in Sources */,
 				1422468E2937C3550095D4C9 /* String+MD5.swift in Sources */,
 				14EDD2A12938C78B00A67252 /* ComicsCellModel.swift in Sources */,
+				148E9A75293DED8E00F4CFE3 /* ComicItems+CoreDataClass.swift in Sources */,
 				14EDD2B22938FAAD00A67252 /* CoreDataService.swift in Sources */,
 				142246912937C3550095D4C9 /* NetworkService.swift in Sources */,
 				14EDD2A52938C79F00A67252 /* CharacterDetaisViewController.swift in Sources */,
@@ -603,6 +617,7 @@
 				1493BD1629384CB600994242 /* CharactersCellModel.swift in Sources */,
 				148E9A45293DBDC700F4CFE3 /* MarvelCharacter+CoreDataProperties.swift in Sources */,
 				14EDD2AB2938C7DC00A67252 /* CharacterDetailsViewModel.swift in Sources */,
+				148E9A73293DED8E00F4CFE3 /* ComicItems+CoreDataProperties.swift in Sources */,
 				148E9A44293DBDC700F4CFE3 /* Favorite+CoreDataClass.swift in Sources */,
 				14EDD2AD2938C7EC00A67252 /* Comics.swift in Sources */,
 				1493BD1429384C9B00994242 /* CharactersCell.swift in Sources */,
@@ -612,6 +627,7 @@
 				1422463E2937B2DC0095D4C9 /* MarvelApp.xcdatamodeld in Sources */,
 				14EDD2A22938C78B00A67252 /* CharacterDetailsCellModel.swift in Sources */,
 				142246362937B2DC0095D4C9 /* SceneDelegate.swift in Sources */,
+				148E9A74293DED8E00F4CFE3 /* Comics+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

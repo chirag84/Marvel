@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21279" systemVersion="21G83" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="ComicItems" representedClassName="ComicItems" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="resourceURI" optional="YES" attributeType="String"/>
+        <relationship name="belongToComics" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Comics" inverseName="hasItems" inverseEntity="Comics"/>
+    </entity>
+    <entity name="Comics" representedClassName="Comics" syncable="YES">
+        <attribute name="available" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="collectionURI" optional="YES" attributeType="String"/>
+        <relationship name="belonToMarvelCharacter" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MarvelCharacter" inverseName="hasComic" inverseEntity="MarvelCharacter"/>
+        <relationship name="hasItems" optional="YES" toMany="YES" maxCount="5" deletionRule="Nullify" destinationEntity="ComicItems" inverseName="belongToComics" inverseEntity="ComicItems"/>
+    </entity>
     <entity name="Favorite" representedClassName="Favorite" syncable="YES">
         <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="isFavorite" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -14,6 +25,7 @@
         <attribute name="id" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="thumbnail" optional="YES" attributeType="String" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
+        <relationship name="hasComic" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Comics" inverseName="belonToMarvelCharacter" inverseEntity="Comics"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="id"/>
